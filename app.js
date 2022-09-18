@@ -15,6 +15,11 @@ const tours = JSON.parse(
 // Middleware to parse the request body
 app.use(express.json());
 
+// Custom middle ware
+app.use((req, res, next) => {
+  console.log('Hello from the middle ware!');
+});
+
 const getAllTours = function (req, res) {
   res.status(200).json({
     success: true,
