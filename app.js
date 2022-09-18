@@ -103,15 +103,23 @@ const deleteTour = function (req, res) {
   );
 };
 
-app.get(`${API_BASE_URL}/tours`, getAllTours);
+// app.get(`${API_BASE_URL}/tours`, getAllTours);
 
-app.get(`${API_BASE_URL}/tours/:id`, getTour);
+// app.get(`${API_BASE_URL}/tours/:id`, getTour);
 
-app.post(`${API_BASE_URL}/tours`, createTour);
+// app.post(`${API_BASE_URL}/tours`, createTour);
 
-app.patch(`${API_BASE_URL}/tours/:id([0-9]+)`, updateTour);
+// app.patch(`${API_BASE_URL}/tours/:id([0-9]+)`, updateTour);
 
-app.delete(`${API_BASE_URL}/tours/:id([0-9]+)`, deleteTour);
+// app.delete(`${API_BASE_URL}/tours/:id([0-9]+)`, deleteTour);
+
+app.route(`${API_BASE_URL}/tours`).get(getAllTours).post(createTour);
+
+app
+  .route(`${API_BASE_URL}/tours/:id([0-9]+)`)
+  .get(getTour)
+  .patch(updateTour)
+  .delete(deleteTour);
 
 app.listen(PORT, HOST, () => {
   console.log(`Running on port ${PORT}...`);
