@@ -15,15 +15,15 @@ const tours = JSON.parse(
 // Middleware to parse the request body
 app.use(express.json());
 
-app.get(`${API_BASE_URL}/tours`, (req, res) => {
+const getAllTours = function (req, res) {
   res.status(200).json({
     success: true,
     results: tours.length,
     tours,
   });
-});
+};
 
-app.get(`${API_BASE_URL}/tours/:id`, (req, res) => {
+const getTour = function (req, res) {
   const id = +req.params.id;
   const tour = tours.find((tour) => tour.id === id);
   if (!tour) {
@@ -36,9 +36,9 @@ app.get(`${API_BASE_URL}/tours/:id`, (req, res) => {
     success: true,
     tour,
   });
-});
+};
 
-app.post(`${API_BASE_URL}/tours`, (req, res) => {
+const createTour = function (req, res) {
   const newId = tours[tours.length - 1]?.id + 1 || 1;
   const newTour = Object.assign({ id: newId }, req.body);
   tours.push(newTour);
@@ -51,9 +51,9 @@ app.post(`${API_BASE_URL}/tours`, (req, res) => {
       res.status(201).json(newTour);
     }
   );
-});
+};
 
-app.patch(`${API_BASE_URL}/tours/:id([0-9]+)`, (req, res) => {
+const updateTour = function (req, res) {
   const id = +req.params.id;
   const update = req.body;
   const toBeUpdatedTourIndex = tours.findIndex((tour) => tour.id === id);
@@ -77,9 +77,9 @@ app.patch(`${API_BASE_URL}/tours/:id([0-9]+)`, (req, res) => {
       });
     }
   );
-});
+};
 
-app.delete(`${API_BASE_URL}/tours/:id([0-9]+)`, (req, res) => {
+const deleteTour = function (req, res) {
   const id = +req.params.id;
   const toBeDeletedTourIndex = tours.findIndex((tour) => tour.id === id);
   if (toBeDeletedTourIndex === -1) {
@@ -101,7 +101,17 @@ app.delete(`${API_BASE_URL}/tours/:id([0-9]+)`, (req, res) => {
       });
     }
   );
-});
+};
+
+app.get(`${API_BASE_URL}/tours`, getAllTours);
+
+app.get(`${API_BASE_URL}/tours/:id`, getTour);
+
+app.post(`${API_BASE_URL}/tours`, createTour);
+
+app.patch(`${API_BASE_URL}/tours/:id([0-9]+)`, updateTour);
+
+app.delete(`${API_BASE_URL}/tours/:id([0-9]+)`, deleteTour);
 
 app.listen(PORT, HOST, () => {
   console.log(`Running on port ${PORT}...`);
