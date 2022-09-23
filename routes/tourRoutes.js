@@ -12,9 +12,10 @@ router
   .post(toursController.createTour);
 
 router
-  .route('/:id([0-9]+)')
+  .route('/:id')
   .get(toursController.getTour)
   .patch(toursController.updateTour)
   .delete(toursController.deleteTour);
 
 module.exports = router;
+// .route('/:id([0-9]+)')

@@ -55,6 +55,24 @@ exports.createTour = async function (req, res) {
   }
 };
 
-exports.updateTour = function (req, res) {};
+exports.updateTour = async function (req, res) {
+  try {
+    const updatedTour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    res.status(200).json({
+      success: true,
+      data: {
+        tour: updatedTour,
+      },
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error,
+    });
+  }
+};
 
 exports.deleteTour = function (req, res) {};
