@@ -1,19 +1,5 @@
 const mongoose = require('mongoose');
 
-const DB = process.env.DATABASE.replace(
-  '<PASSWORD>',
-  process.env.DATABASE_PASSWORD
-);
-
-// Connecting our application with the cloud-hosted MongoDB server using mongoose ODM
-
-async function main() {
-  await mongoose.connect(DB);
-  console.log('DB connection successful!!!');
-}
-
-main().catch((err) => console.log(err));
-
 // First steps with Schemas
 
 const tourSchema = new mongoose.Schema({
@@ -21,15 +7,51 @@ const tourSchema = new mongoose.Schema({
     type: String,
     required: [true, 'A tour must have a name'],
     unique: true,
+    trim: true,
   },
-  rating: {
+  duration: {
+    type: Number,
+    required: [true, 'A tour must have a duration'],
+  },
+  maxGroupSize: {
+    type: Number,
+    required: [true, 'A tour must have a max group size'],
+  },
+  difficulty: {
+    type: String,
+    required: [true, 'A tour must have a difficulty'],
+  },
+  ratingsAverage: {
     type: Number,
     default: 4.5,
+  },
+  ratingsQuantity: {
+    type: Number,
+    default: 0,
   },
   price: {
     type: Number,
     required: [true, 'A tour must have a price'],
   },
+  summary: {
+    type: String,
+    required: [true, 'A tour must have a description'],
+    trim: true,
+  },
+  description: {
+    type: String,
+    trim: true,
+  },
+  imageCover: {
+    type: String,
+    required: [true, 'A tour must have a bg image'],
+  },
+  images: [String],
+  createdAt: {
+    type: Date,
+    default: Date.now(),
+  },
+  startDates: [Date],
 });
 
 const Tour = mongoose.model('Tour', tourSchema);

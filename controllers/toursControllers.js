@@ -2,7 +2,11 @@ const Tour = require('../models/toursModel');
 
 exports.getAllTours = async function (req, res) {
   try {
-    const tours = await Tour.find();
+    const queryObj = { ...req.query };
+    const excludedKeys = ['page', 'sort', 'limit', 'fields'];
+    excludedKeys.forEach((key) => delete queryObj[key]);
+    const query = Tour.find(queryObj);
+    const tours = await query;
     res.status(200).json({
       success: true,
       results: tours.length,
@@ -48,7 +52,7 @@ exports.createTour = async function (req, res) {
       },
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(404).json({
       success: false,
       message: error,
     });
@@ -68,11 +72,26 @@ exports.updateTour = async function (req, res) {
       },
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(404).json({
       success: false,
       message: error,
     });
   }
 };
 
-exports.deleteTour = function (req, res) {};
+exports.deleteTour = async function (req, res) {
+  try {
+    await Tour.findByIdAndDelete(req.params.id, {
+      strict: true,
+    });
+    res.status(204).json({
+      success: true,
+      data: null,
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      message: error,
+    });
+  }
+};

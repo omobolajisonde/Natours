@@ -1,4 +1,5 @@
 const express = require('express');
+const logger = require('morgan');
 
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
@@ -8,6 +9,11 @@ const app = express();
 
 // APP VARIABLES
 const API_BASE_URL = '/api/v1';
+
+// APP REQUEST LOGS FOR DEVELOPMENT
+if (process.env.NODE_ENV === 'development') {
+  app.use(logger('dev'));
+}
 
 // Serving static files
 app.use(express.static('public'));
