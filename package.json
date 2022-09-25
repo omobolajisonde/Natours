@@ -2,7 +2,7 @@
   "name": "natours",
   "version": "1.0.0",
   "description": "First steps with Express, MongoDB and backend development",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
     "start": "nodemon server.js"
   },
