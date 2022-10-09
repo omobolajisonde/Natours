@@ -10,6 +10,8 @@ router.get(
   toursController.getAllTours
 );
 
+router.get('/tour-stats', toursController.getTourStats);
+
 router
   .route('/')
   .get(toursController.getAllTours)
