@@ -8,9 +8,10 @@ router.get(
   '/top-5-cheap',
   toursController.aliasTopTours,
   toursController.getAllTours
-);
+); // Aliasing common route
 
 router.get('/tour-stats', toursController.getTourStats);
+router.get('/monthly-plan/:year', toursController.getMonthlyPlan);
 
 router
   .route('/')

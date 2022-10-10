@@ -8,10 +8,11 @@ const app = require('./app');
 // APP VARIABLES
 const PORT = process.env.PORT || 8000;
 const HOST = process.env.HOST || '127.0.0.1';
-const DB = process.env.DATABASE.replace(
-  '<PASSWORD>',
-  process.env.DATABASE_PASSWORD
-);
+const DB = process.env.DATABASE; // local DB server
+// const DB = process.env.DATABASE.replace(
+//   '<PASSWORD>',
+//   process.env.DATABASE_PASSWORD
+// ); connecting to ATLAS DB server
 
 // Connecting our application with the cloud-hosted MongoDB server using mongoose ODM
 
