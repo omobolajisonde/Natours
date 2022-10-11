@@ -1,9 +1,64 @@
-module.exports = (error, req, res, next) => {
-  // console.log(error.stack); // logs the error stack trace
-  const statusCode = error.statusCode || 500;
-  const status = error.status || 'Internal server error';
-  return res.status(statusCode).json({
-    status: status,
-    message: error.message,
+const AppError = require('../utils/appError');
+
+const handleDBCastError = (err) => {
+  const message = `Invalid ${err.path}: ${err.value}`;
+  return new AppError(message, 400);
+};
+
+const handleDBDuplicateError = (err) => {
+  const message = `Duplicate value, '${err.keyValue.name}' for the '${
+    Object.keys(err.keyPattern)[0]
+  }' field.`;
+  return new AppError(message, 400);
+};
+
+const handleDBValidationError = (err) => {
+  const values = Object.values(err.errors).map((val) => val.message);
+  const message = `Invalid input data! ${values.join('. ')}`;
+  return new AppError(message, 400);
+};
+
+const sendErrorDev = (err, res) => {
+  return res.status(err.statusCode).json({
+    error: err,
+    status: err.status,
+    message: err.message,
+    stack: err.stack,
   });
+};
+
+const sendErrorProd = (err, res) => {
+  if (err.isOperational) {
+    return res.status(err.statusCode).json({
+      status: err.status,
+      message: err.message,
+    });
+  } else {
+    console.error(err);
+    return res.status(500).json({
+      status: 'Internal server error',
+      message: 'Something went terribly wrong!',
+    });
+  }
+};
+
+module.exports = (err, req, res, next) => {
+  // console.log(error.stack); // logs the error stack trace
+  err.statusCode = err.statusCode || 500;
+  err.status = err.status || 'Internal server error';
+  if (process.env.NODE_ENV === 'development') {
+    sendErrorDev(err, res);
+  } else if (process.env.NODE_ENV === 'production') {
+    let error = JSON.parse(JSON.stringify(err)); // cause it is not ideal to manipulate function args. Also it was done this way cause the name property is only available when the outpu is JSON and not Object
+    if (error.name === 'CastError') {
+      error = handleDBCastError(error); // Returns an Instance of our AppError which ofc will add the isOperational property set to true.
+    }
+    if (error.code === 11000) {
+      error = handleDBDuplicateError(error);
+    } // handles error due to value not unique in a field with the unique constraint
+    if (error.name === 'ValidationError') {
+      error = handleDBValidationError(error);
+    }
+    sendErrorProd(error, res);
+  }
 };
