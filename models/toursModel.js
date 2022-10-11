@@ -10,6 +10,8 @@ const tourSchema = new mongoose.Schema(
       required: [true, 'A tour must have a name'],
       unique: true,
       trim: true,
+      maxLength: [40, 'Tour name should not be longer than 40 characters'],
+      minLength: [10, 'Tour name should not be lesser than 10 characters'],
     },
     slug: String,
     duration: {
@@ -23,10 +25,17 @@ const tourSchema = new mongoose.Schema(
     difficulty: {
       type: String,
       required: [true, 'A tour must have a difficulty'],
+      enum: {
+        values: ['easy', 'medium', 'difficult'],
+        message:
+          'Difficulty can only be any of "easy", "medium" or "difficult"',
+      },
     },
     ratingsAverage: {
       type: Number,
       default: 4.5,
+      min: [0, "Tour average rating can't be less than nothing"],
+      max: [5, "Tour average rating can't be more than five"],
     },
     ratingsQuantity: {
       type: Number,
@@ -35,6 +44,17 @@ const tourSchema = new mongoose.Schema(
     price: {
       type: Number,
       required: [true, 'A tour must have a price'],
+    },
+    priceDiscount: {
+      type: Number,
+      validate: [
+        // custom validation using the validate property
+        function (value) {
+          // p.s this = the current doc only during creaton. During, updating nah!
+          return value < this.price;
+        },
+        'The discounted price, {VALUE} should not be more than the original price homie!',
+      ],
     },
     summary: {
       type: String,
@@ -89,7 +109,7 @@ tourSchema.pre('save', function (next) {
 // });
 
 // Query Middleware
-// * pre save middleware or hooks
+// * pre save middleware or hook
 tourSchema.pre(/^find/, function (next) {
   // /^find/ regexp, is so that it runs for every query method that starts with "find"
   this.find({ secret_tour: { $ne: true } });
@@ -101,6 +121,13 @@ tourSchema.pre(/^find/, function (next) {
 //   console.log(doc);
 //   next();
 // });
+
+// Aggregate Middleware
+// *pre aggregate middleware or hook
+tourSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { secret_tour: { $ne: true } } });
+  next();
+});
 
 const Tour = mongoose.model('Tour', tourSchema);
 
