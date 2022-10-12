@@ -18,6 +18,11 @@ const handleDBValidationError = (err) => {
   return new AppError(message, 400);
 };
 
+const handleJWTError = () =>
+  new AppError('Invalid token! Please login again.', 401);
+const handleJWTExpiredError = () =>
+  new AppError('Token expired! Please login again.', 401);
+
 const sendErrorDev = (err, res) => {
   return res.status(err.statusCode).json({
     error: err,
@@ -58,6 +63,12 @@ module.exports = (err, req, res, next) => {
     } // handles error due to value not unique in a field with the unique constraint
     if (error.name === 'ValidationError') {
       error = handleDBValidationError(error);
+    }
+    if (error.name === 'JsonWebTokenError') {
+      error = handleJWTError(error);
+    }
+    if (error.name === 'TokenExpiredError') {
+      error = handleJWTExpiredError(error);
     }
     sendErrorProd(error, res);
   }

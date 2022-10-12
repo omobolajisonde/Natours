@@ -38,6 +38,7 @@ const userSchema = new mongoose.Schema({
       "C'mon password must match!",
     ],
   },
+  passwordModifiedAt: { type: Date },
 });
 
 // Document pre save middleware/hook
@@ -51,11 +52,24 @@ userSchema.pre('save', async function (next) {
   this.confirmPassword = undefined;
 });
 
+// All documents created from this schema would have access to these methods
+
 userSchema.methods.correctPassword = async function (
   enteredPassword,
   userHashedPassword
 ) {
   return await bcrypt.compare(enteredPassword, userHashedPassword);
+};
+userSchema.methods.changedPasswordAfter = function (JWTIATTimeStamp) {
+  if (this.passwordModifiedAt) {
+    const passwordModifiedAtTimeStamp = parseInt(
+      this.passwordModifiedAt.getTime() / 1000,
+      10
+    );
+    // console.log(JWTIATTimeStamp, passwordModifiedAtTimeStamp);
+    return JWTIATTimeStamp < passwordModifiedAtTimeStamp;
+  }
+  return false;
 };
 
 const User = mongoose.model('User', userSchema);
