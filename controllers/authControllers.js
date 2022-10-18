@@ -12,7 +12,7 @@ const getSignedToken = (id) => {
   });
 };
 
-exports.auth = catchAsync(async (req, res, next) => {
+exports.authenticate = catchAsync(async (req, res, next) => {
   let token;
   // Check if a Bearer Token is present in the request header
   if (
@@ -42,14 +42,40 @@ exports.auth = catchAsync(async (req, res, next) => {
       new AppError('User recently changed password! Please log in again.', 401)
     );
   // Grants Access!
-  res.locals.user = claimUser;
+  req.user = claimUser;
   next();
 });
+
+exports.authorizeWith = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError(
+          'Permission denied! You are not permitted to carry out this action.',
+          403
+        )
+      );
+    }
+    next();
+  };
+};
+
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    return next(new AppError(`User with email, ${email} does not exist!`, 404));
+  }
+  const resetToken = user.genResetToken();
+  await user.save({ validateBeforeSave: false });
+});
+exports.resetPassword = (req, res, next) => {};
 
 exports.signUpUser = catchAsync(async (req, res, next) => {
   const user = await User.create({
     name: req.body.name,
     email: req.body.email,
+    role: req.body.role,
     password: req.body.password,
     confirmPassword: req.body.confirmPassword,
   });

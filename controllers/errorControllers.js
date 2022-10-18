@@ -54,7 +54,7 @@ module.exports = (err, req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {
-    let error = JSON.parse(JSON.stringify(err)); // cause it is not ideal to manipulate function args. Also it was done this way cause the name property is only available when the outpu is JSON and not Object
+    let error = JSON.parse(JSON.stringify(err)); // cause it is not ideal to manipulate function args. Also it was done this way cause the name property is only available when the output is JSON and not Object
     if (error.name === 'CastError') {
       error = handleDBCastError(error); // Returns an Instance of our AppError which ofc will add the isOperational property set to true.
     }
