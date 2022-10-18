@@ -58,8 +58,16 @@ userSchema.pre('save', async function (next) {
   this.password = hashedPassword;
   // Prevents the confirmPassword from entering DB
   this.confirmPassword = undefined;
+  next();
 });
 
+// Update the passwordModifiedAt after password change
+
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+  this.passwordModifiedAt = Date.now() - 1000; // setting it to 1 sec in the past cause the actual saving might happen after jwt is issued
+  next();
+});
 // All documents created from this schema would have access to these methods
 
 userSchema.methods.correctPassword = async function (
