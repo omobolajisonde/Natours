@@ -13,6 +13,18 @@ const getSignedToken = (id) => {
   });
 };
 
+const authenticateResponse = function (user, statusCode, res) {
+  const token = getSignedToken(user._id);
+
+  return res.status(statusCode).json({
+    success: true,
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
 exports.authenticate = catchAsync(async (req, res, next) => {
   let token;
   // Check if a Bearer Token is present in the request header
@@ -118,11 +130,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   await user.save();
   // 3) Update passwordModifiedAt property for the user
   // 4) Log the user in, send JWT
-  const jwToken = getSignedToken(user._id);
-  return res.status(200).json({
-    success: true,
-    token: jwToken,
-  });
+  authenticateResponse(user, 200, res);
 });
 
 exports.signUpUser = catchAsync(async (req, res, next) => {
@@ -134,15 +142,7 @@ exports.signUpUser = catchAsync(async (req, res, next) => {
     confirmPassword: req.body.confirmPassword,
   });
 
-  const token = getSignedToken(user._id);
-
-  return res.status(201).json({
-    success: true,
-    token,
-    data: {
-      user,
-    },
-  });
+  authenticateResponse(user, 201, res);
 });
 
 exports.signInUser = catchAsync(async (req, res, next) => {
@@ -154,14 +154,37 @@ exports.signInUser = catchAsync(async (req, res, next) => {
     );
   }
   // Finds user and compare password
-  const user = await User.findOne({ email }).select(['password']);
+  const user = await User.findOne({ email }).select('+password');
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError('email or password not correct!', 401));
   }
-  //   Generates token
-  const token = getSignedToken(user._id);
-  return res.status(200).json({
-    success: true,
-    token,
-  });
+  console.log(user);
+  authenticateResponse(user, 200, res);
+});
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // 1. Get the User
+  const user = await User.findById(req.user._id).select('+password');
+
+  // 2. Check the provided password
+  const { currentPassword, password, confirmPassword } = req.body;
+  // Checks if current password is indeed provided
+  if (!currentPassword) {
+    return next(new AppError('Provide your current password.', 400));
+  }
+  if (!(await user.correctPassword(currentPassword, user.password))) {
+    return next(new AppError('Incorrect password!', 401));
+  }
+
+  // 3. Update password
+  // Checks if password and confirmPassword is indeed provided
+  if (!password || !confirmPassword) {
+    return next(new AppError('Enter your new password and confirm it.', 400));
+  }
+  user.password = password;
+  user.confirmPassword = confirmPassword;
+  await user.save({ validateBeforeSave: true });
+
+  // 4. Log user in freshly, basically sending a fresh JWT
+  authenticateResponse(user, 200, res);
 });

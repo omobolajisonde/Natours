@@ -5,6 +5,8 @@ const {
   signInUser,
   forgotPassword,
   resetPassword,
+  authenticate,
+  updatePassword,
 } = require('../controllers/authControllers');
 
 const usersController = require('./../controllers/usersController');
@@ -15,6 +17,7 @@ router.post('/signup', signUpUser);
 router.post('/signin', signInUser);
 router.post('/forgotPassword', forgotPassword);
 router.post('/resetPassword/:token', resetPassword);
+router.patch('/updateMyPassword', authenticate, updatePassword);
 
 router
   .route('/')
