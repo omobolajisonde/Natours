@@ -1,5 +1,6 @@
 const express = require('express');
 const logger = require('morgan');
+const rateLimit = require('express-rate-limit');
 
 const AppError = require('./utils/appError');
 const globalErrorMiddleware = require('./controllers/errorControllers');
@@ -22,6 +23,14 @@ app.use(express.static('public'));
 
 // Middleware to parse the request body
 app.use(express.json());
+
+// rate limit implementation
+const limiter = rateLimit({
+  max: 100, // max allowable number of request from an IP address in a given timeframe
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many requests from your IP address, please try again later.',
+});
+app.use('/api', limiter);
 
 // Custom middle ware
 app.use((req, res, next) => {
