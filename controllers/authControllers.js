@@ -16,6 +16,16 @@ const getSignedToken = (id) => {
 const authenticateResponse = function (user, statusCode, res) {
   const token = getSignedToken(user._id);
 
+  // Send jwt as cookie to client
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+  };
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true; // ensures the cookie is sent only if our production protocol is HTTPS
+  res.cookie('jwt', token, cookieOptions);
+
   return res.status(statusCode).json({
     success: true,
     token,

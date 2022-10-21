@@ -47,6 +47,16 @@ const userSchema = new mongoose.Schema({
   passwordModifiedAt: { type: Date },
   passwordResetToken: String,
   passwordResetTokenExpiresIn: Date,
+  active: {
+    type: Boolean,
+    default: true,
+  },
+});
+
+// Query /find/ middleware/hook
+userSchema.pre(/^find/, function (next) {
+  this.find({ active: { $ne: false } });
+  next();
 });
 
 // Document pre save middleware/hook

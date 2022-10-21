@@ -18,6 +18,8 @@ router.post('/signin', signInUser);
 router.post('/forgotPassword', forgotPassword);
 router.post('/resetPassword/:token', resetPassword);
 router.patch('/updateMyPassword', authenticate, updatePassword);
+router.patch('/updateMe', authenticate, usersController.updateMe);
+router.delete('/deleteMe', authenticate, usersController.deleteMe);
 
 router
   .route('/')
