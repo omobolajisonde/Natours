@@ -24,8 +24,8 @@ const authenticateResponse = function (user, statusCode, res) {
     httpOnly: true,
   };
   if (process.env.NODE_ENV === 'production') cookieOptions.secure = true; // ensures the cookie is sent only if our production protocol is HTTPS
-  res.cookie('jwt', token, cookieOptions);
-
+  res.cookie('jwt', token, cookieOptions); // sends jwt as cookie to the client
+  user.password = undefined; // so the password won't be part of the output
   return res.status(statusCode).json({
     success: true,
     token,
