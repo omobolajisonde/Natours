@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 
+// const User = require('./userModel');
+
 // First steps with Schemas
+
+const ObjectId = mongoose.Schema.ObjectId;
 
 const tourSchema = new mongoose.Schema(
   {
@@ -77,6 +81,35 @@ const tourSchema = new mongoose.Schema(
     },
     startDates: [Date],
     secret_tour: { type: Boolean, default: false },
+    startLocation: {
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      }, // must have since this is a geospatial data
+      coordinates: [Number], //(long, lat) must have since this is a geospatial data
+      address: String,
+      description: String,
+    }, // type: Object (contains all these rather unique properties cause it's a Geospatial Data)
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+    guides: [
+      {
+        type: ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   {
     toJSON: { virtuals: true }, // when requesting a JSON output, the virtual properties should be added to the returned fields
@@ -102,6 +135,13 @@ tourSchema.pre('save', function (next) {
   next();
 });
 
+// Embedding tour guides
+// tourSchema.pre('save', async function (next) {
+//   const guidesPromise = this.guides.map(async (id) => await User.findById(id));
+//   this.guides = await Promise.all(guidesPromise);
+//   next();
+// });
+
 // * post save middleware or hook
 // tourSchema.post('save', function (doc, next) {
 //   console.log(doc);
@@ -113,6 +153,14 @@ tourSchema.pre('save', function (next) {
 tourSchema.pre(/^find/, function (next) {
   // /^find/ regexp, is so that it runs for every query method that starts with "find"
   this.find({ secret_tour: { $ne: true } });
+  next();
+});
+
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordModifiedAt',
+  }); // populates the guides field in the Tours model with the document in the User model corresponding with the ObjectId
   next();
 });
 

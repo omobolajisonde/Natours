@@ -51,7 +51,7 @@ exports.authenticate = catchAsync(async (req, res, next) => {
 
   // Verify token
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-  console.log(decoded);
+  // console.log(decoded);
   // Checks if User with id claim still exists
   const claimUser = await User.findById(decoded.id);
   if (!claimUser)
