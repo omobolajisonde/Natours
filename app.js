@@ -10,6 +10,7 @@ const AppError = require('./utils/appError');
 const globalErrorMiddleware = require('./controllers/errorControllers');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+const reviewRouter = require('./routes/reviewRoutes');
 
 // APP INITIALIZATION
 const app = express();
@@ -67,6 +68,8 @@ app.use((req, res, next) => {
 app.use(`${API_BASE_URL}/tours`, tourRouter);
 
 app.use(`${API_BASE_URL}/users`, userRouter);
+
+app.use(`${API_BASE_URL}/reviews`, reviewRouter);
 
 // Any request that makes it to this part has lost it's way
 app.all('*', (req, res, next) => {

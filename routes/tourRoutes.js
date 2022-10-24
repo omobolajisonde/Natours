@@ -5,8 +5,11 @@ const {
   authenticate,
   authorizeWith,
 } = require('./../controllers/authControllers');
+const reviewRouter = require('./reviewRoutes');
 
 const router = express.Router();
+
+router.use('/:tourId/reviews', reviewRouter);
 
 router.get(
   '/top-5-cheap',

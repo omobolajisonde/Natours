@@ -122,6 +122,13 @@ tourSchema.virtual('durationInWeeks').get(function () {
   return (this.duration / 7).toFixed(2);
 });
 
+// Virtual Populate (getting the reviews for each tour on query)
+tourSchema.virtual('reviews', {
+  ref: 'Review', // The model for reviews
+  foreignField: 'tour', // The review field holding the tour _id (used to set up a connection with the current tour document)
+  localField: '_id',
+});
+
 // MIDDLEWARE IN THE MONGOOSE WORLD
 
 // Document Middleware
