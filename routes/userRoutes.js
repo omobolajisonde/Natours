@@ -21,13 +21,10 @@ router.patch('/updateMyPassword', authenticate, updatePassword);
 router.patch('/updateMe', authenticate, usersController.updateMe);
 router.delete('/deleteMe', authenticate, usersController.deleteMe);
 
-router
-  .route('/')
-  .get(usersController.getAllUsers)
-  .post(usersController.createUser);
+router.route('/').get(usersController.getAllUsers);
 
 router
-  .route('/:id([0-9]+)')
+  .route('/:id')
   .get(usersController.getUser)
   .patch(usersController.updateUser)
   .delete(usersController.deleteUser);

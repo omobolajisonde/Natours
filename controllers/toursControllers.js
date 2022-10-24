@@ -2,6 +2,13 @@ const Tour = require('../models/tourModel');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const {
+  getOne,
+  deleteOne,
+  updateOne,
+  createOne,
+  getAll,
+} = require('./factoryHandler');
 
 exports.aliasTopTours = async function (req, res, next) {
   req.query.limit = 5;
@@ -11,84 +18,15 @@ exports.aliasTopTours = async function (req, res, next) {
   next();
 };
 
-exports.getAllTours = catchAsync(async function (req, res, next) {
-  const features = new APIFeatures(Tour.find({}), req.query)
-    .filter()
-    .sort()
-    .project()
-    .paginate();
-  console.log('HERE');
-  const tours = await features.queryObj;
-  res.status(200).json({
-    success: true,
-    page: +req.query.page || 1,
-    results: tours.length,
-    data: {
-      tours,
-    },
-  });
-});
+exports.getAllTours = getAll(Tour);
 
-exports.getTour = catchAsync(async function (req, res, next) {
-  const tour = await Tour.findById(req.params.id).populate('reviews'); // Tour.findOne({_id: req.params.id});
-  if (!tour) {
-    return next(
-      new AppError(`Tour with id, ${req.params.id} does not exist!`, 404)
-    );
-  }
-  res.status(200).json({
-    success: true,
-    data: {
-      tour,
-    },
-  });
-});
+exports.getTour = getOne(Tour, 'Tour', { path: 'reviews' });
 
-exports.createTour = catchAsync(async function (req, res, next) {
-  // const toBeCreatedTour = new Tour(req.body);
-  // const newTour = await toBeCreatedTour.save();
+exports.createTour = createOne(Tour);
 
-  const newTour = await Tour.create(req.body);
-  res.status(201).json({
-    success: true,
-    data: {
-      tour: newTour,
-    },
-  });
-});
+exports.updateTour = updateOne(Tour, 'Tour');
 
-exports.updateTour = catchAsync(async function (req, res, next) {
-  const updatedTour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-  if (!updatedTour) {
-    return next(
-      new AppError(`Tour with id, ${req.params.id} does not exist!`, 404)
-    );
-  }
-  res.status(200).json({
-    success: true,
-    data: {
-      tour: updatedTour,
-    },
-  });
-});
-
-exports.deleteTour = catchAsync(async function (req, res, next) {
-  const deletedTour = await Tour.findByIdAndDelete(req.params.id, {
-    strict: true,
-  });
-  if (!deletedTour) {
-    return next(
-      new AppError(`Tour with id, ${req.params.id} does not exist!`, 404)
-    );
-  }
-  res.status(204).json({
-    success: true,
-    data: null,
-  });
-});
+exports.deleteTour = deleteOne(Tour, 'Tour');
 
 exports.getTourStats = catchAsync(async function (req, res, next) {
   // Aggregation using the Aggregation Pipeline

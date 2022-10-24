@@ -15,6 +15,7 @@ class APIFeatures {
       (match) => `$${match}`
     );
     queryParamsClone = JSON.parse(queryStr); // converting back to JS Obj
+    console.log(queryParamsClone);
     this.queryObj = this.queryObj.find(queryParamsClone);
     return this; // returning the instance
   }
