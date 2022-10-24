@@ -18,17 +18,30 @@ router.get(
 ); // Aliasing common route
 
 router.get('/tour-stats', toursController.getTourStats);
-router.get('/monthly-plan/:year', toursController.getMonthlyPlan);
+router.get(
+  '/monthly-plan/:year',
+  authenticate,
+  authorizeWith('admin', 'lead-guide', 'guide'),
+  toursController.getMonthlyPlan
+);
 
 router
   .route('/')
-  .get(authenticate, toursController.getAllTours)
-  .post(toursController.createTour);
+  .get(toursController.getAllTours)
+  .post(
+    authenticate,
+    authorizeWith('admin', 'lead-guide'),
+    toursController.createTour
+  );
 
 router
   .route('/:id')
   .get(toursController.getTour)
-  .patch(toursController.updateTour)
+  .patch(
+    authenticate,
+    authorizeWith('admin', 'lead-guide'),
+    toursController.updateTour
+  )
   .delete(
     authenticate,
     authorizeWith('admin', 'lead-guide'),

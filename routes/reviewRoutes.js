@@ -15,9 +15,15 @@ const {
 
 const router = express.Router({ mergeParams: true });
 
+router.use(authenticate);
+
 router
   .route('/')
-  .get(getAllReviews)
-  .post(authenticate, authorizeWith('user'), setTourAndUserIds, createReview);
-router.route('/:id').get(getReview).patch(updateReview).delete(deleteReview);
+  .get(authorizeWith('admin', 'lead-guide', 'guide'), getAllReviews)
+  .post(authorizeWith('user'), setTourAndUserIds, createReview);
+router
+  .route('/:id')
+  .get(authorizeWith('admin', 'lead-guide', 'guide'), getReview)
+  .patch(authorizeWith('admin', 'user'), updateReview)
+  .delete(authorizeWith('admin', 'user'), deleteReview);
 module.exports = router;

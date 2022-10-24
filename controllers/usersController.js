@@ -13,10 +13,13 @@ const filterBody = function (body, ...allowedFields) {
 
 exports.getAllUsers = getAll(User);
 exports.getUser = getOne(User, 'User');
-
 exports.updateUser = updateOne(User, 'User');
-
 exports.deleteUser = deleteOne(User, 'User');
+
+exports.getMe = function (req, res, next) {
+  req.params.id = req.user._id; // manually add the current user id to the req params so the getUser controller can work
+  next();
+};
 
 exports.updateMe = catchAsync(async function (req, res, next) {
   // 1. Check if user tries to update password
