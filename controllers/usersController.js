@@ -36,7 +36,7 @@ exports.updateMe = catchAsync(async function (req, res, next) {
   // 3. Update user data
   const user = await User.findByIdAndUpdate(req.user._id, filteredBody, {
     new: true,
-    runValidators: true, // runs validators for only fields we are updating unlike save which runs for all fields regardless.
+    runValidators: true, // runs validators for only updated fields, unlike save (validateBeforeSave) which runs for all fields regardless
   });
   return res.status(200).json({
     success: true,

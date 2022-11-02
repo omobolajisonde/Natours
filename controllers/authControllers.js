@@ -94,7 +94,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   const resetPasswordUrl = `${req.protocol}://${req.get(
     'host'
   )}/api/v1/users/resetPassword/${resetToken}`;
-  const body = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetPasswordUrl}.\nIf you didn't forget your password, please ignore this email!`;
+  const body = `Forgot your password? Submit a PATCH request with your new password and confirmPassword to: ${resetPasswordUrl}.\nIf you didn't forget your password, please ignore this email!`;
   const subject = 'Your password reset token (valid for 10 min)';
   try {
     await sendEmail({
@@ -122,7 +122,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
   const user = await User.findOne({
     passwordResetToken: hashedToken,
-    passwordResetTokenExpiresIn: { $gt: Date.now() },
+    passwordResetTokenExpiresIn: { $gt: Date.now() }, // this confirms that the token hasn't expired
   });
   // 2) If token has not expired, and there is user, set the new password
   if (!user) {
