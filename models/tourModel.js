@@ -17,7 +17,10 @@ const tourSchema = new mongoose.Schema(
       maxLength: [40, 'Tour name should not be longer than 40 characters'],
       minLength: [10, 'Tour name should not be lesser than 10 characters'],
     },
-    slug: String,
+    slug: {
+      type: String,
+      index: true,
+    },
     duration: {
       type: Number,
       required: [true, 'A tour must have a duration'],
@@ -117,6 +120,9 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+// Adding index
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+
 // Virtual properties
 tourSchema.virtual('durationInWeeks').get(function () {
   return (this.duration / 7).toFixed(2);
@@ -125,8 +131,8 @@ tourSchema.virtual('durationInWeeks').get(function () {
 // Virtual Populate (getting the reviews for each tour on query)
 tourSchema.virtual('reviews', {
   ref: 'Review', // The model for reviews
-  foreignField: 'tour', // The review field holding the tour _id (used to set up a connection with the current tour document)
-  localField: '_id',
+  foreignField: 'tour', // The field in the review table holding the tour _id (used to set up a connection with the current tour document)
+  localField: '_id', // Other part of the connection. (foreignField and localField must be same for it to work)
 });
 
 // MIDDLEWARE IN THE MONGOOSE WORLD

@@ -25,7 +25,7 @@ exports.getAll = (Model) =>
 
 exports.getOne = (Model, docType, populateOptions) =>
   catchAsync(async function (req, res, next) {
-    let query = Model.findById(req.params.id); // Tour.findOne({_id: req.params.id});
+    let query = Model.findById(req.params.id); // Model.findOne({_id: req.params.id});
     if (populateOptions) query.populate(populateOptions);
     const doc = await query;
     if (!doc) {

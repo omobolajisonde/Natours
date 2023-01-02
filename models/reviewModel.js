@@ -9,7 +9,7 @@ const reviewSchema = new Schema(
       type: String,
       required: [true, "C'mon express your opinion about this tour."],
     },
-    ratings: {
+    rating: {
       type: Number,
       min: 1,
       max: 5,
