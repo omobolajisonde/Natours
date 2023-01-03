@@ -28,6 +28,33 @@ exports.updateTour = updateOne(Tour, 'Tour');
 
 exports.deleteTour = deleteOne(Tour, 'Tour');
 
+exports.getToursWithin = catchAsync(async function (req, res, next) {
+  const { distance, latlng, unit } = req.params;
+  const [lat, lng] = latlng.split(',');
+  if (!lat || !lng) {
+    return next(
+      new AppError(
+        'Please, provide the coordinate of the point in this format: lat,lng.',
+        400
+      )
+    );
+  }
+  const radius =
+    unit?.toLowerCase() === 'mi' ? distance / 3963.2 : distance / 6378.1;
+  const tours = await Tour.find({
+    startLocation: {
+      $geoWithin: { $centerSphere: [[lng.trim(), lat.trim()], radius] },
+    },
+  });
+  return res.status(200).json({
+    success: true,
+    results: tours.length,
+    data: {
+      data: tours,
+    },
+  });
+});
+
 exports.getTourStats = catchAsync(async function (req, res, next) {
   // Aggregation using the Aggregation Pipeline
   const stats = await Tour.aggregate([
