@@ -188,6 +188,8 @@ tourSchema.pre(/^find/, function (next) {
 // Aggregate Middleware
 // *pre aggregate middleware or hook
 tourSchema.pre('aggregate', function (next) {
+  if (this.pipeline()[0]['$geoNear']) return next(); // making sure the $geoNear stage is always the first
+
   this.pipeline().unshift({ $match: { secret_tour: { $ne: true } } });
   next();
 });

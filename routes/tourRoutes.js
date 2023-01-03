@@ -30,6 +30,9 @@ router.get(
   toursController.getToursWithin
 );
 
+// Get distances btw tours and a specified location
+router.get('/distances/:latlng/unit/:unit', toursController.getDistances);
+
 router
   .route('/')
   .get(toursController.getAllTours)

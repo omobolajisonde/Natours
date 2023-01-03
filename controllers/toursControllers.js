@@ -55,6 +55,50 @@ exports.getToursWithin = catchAsync(async function (req, res, next) {
   });
 });
 
+// Has a GEOSPATIAL aggregation stage
+
+exports.getDistances = catchAsync(async function (req, res, next) {
+  const { latlng, unit } = req.params;
+  const [lat, lng] = latlng.split(',');
+  if (!lat || !lng) {
+    return next(
+      new AppError(
+        'Please, provide the coordinate of the point in this format: lat,lng.',
+        400
+      )
+    );
+  }
+  const multiplier = unit?.toLowerCase() === 'mi' ? 0.000621 : 0.001;
+  const distances = await Tour.aggregate([
+    {
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: [+lng, +lat],
+        },
+        distanceField: 'distance', // new field that gets created, "distance" and holds the distance value
+        distanceMultiplier: multiplier,
+      }, // in this case, uses the startLocation (which is a geoSpatial index) to calculate the distance from the specified location
+    },
+    {
+      $match: { secret_tour: { $ne: true } },
+    },
+    {
+      $project: {
+        distance: 1,
+        name: 1,
+      },
+    },
+  ]);
+  return res.status(200).json({
+    success: true,
+    results: distances.length,
+    data: {
+      data: distances,
+    },
+  });
+});
+
 exports.getTourStats = catchAsync(async function (req, res, next) {
   // Aggregation using the Aggregation Pipeline
   const stats = await Tour.aggregate([
