@@ -82,10 +82,10 @@ exports.updateOne = (Model, docType) =>
 
 exports.deleteOne = (Model, docType) =>
   catchAsync(async function (req, res, next) {
-    const deletedTour = await Model.findByIdAndDelete(req.params.id, {
+    const deletedDoc = await Model.findByIdAndDelete(req.params.id, {
       strict: true,
     });
-    if (!deletedTour) {
+    if (!deletedDoc) {
       return next(
         new AppError(
           `${docType} with id, ${req.params.id} does not exist!`,

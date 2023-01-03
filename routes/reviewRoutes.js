@@ -19,11 +19,11 @@ router.use(authenticate);
 
 router
   .route('/')
-  .get(authorizeWith('admin', 'lead-guide', 'guide'), getAllReviews)
+  .get(getAllReviews)
   .post(authorizeWith('user'), setTourAndUserIds, createReview);
 router
   .route('/:id')
-  .get(authorizeWith('admin', 'lead-guide', 'guide'), getReview)
+  .get(getReview)
   .patch(authorizeWith('admin', 'user'), updateReview)
   .delete(authorizeWith('admin', 'user'), deleteReview);
 module.exports = router;
