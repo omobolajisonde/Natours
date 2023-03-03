@@ -12,6 +12,7 @@ const globalErrorMiddleware = require('./controllers/errorControllers');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const viewRouter = require('./routes/viewRoutes');
 
 // APP INITIALIZATION
 const app = express();
@@ -69,9 +70,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/', (req, res) => {
-  res.status(200).render('base', { tour: 'Killhouse Camper', user: 'Bolaji' });
-});
+app.use('/', viewRouter);
 
 app.use(`${API_BASE_URL}/tours`, tourRouter);
 
