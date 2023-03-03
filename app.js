@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const logger = require('morgan');
 const rateLimit = require('express-rate-limit');
@@ -14,11 +15,16 @@ const reviewRouter = require('./routes/reviewRoutes');
 
 // APP INITIALIZATION
 const app = express();
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
 
 // APP VARIABLES
 const API_BASE_URL = '/api/v1';
 
 // GLOBAL MIDDLEWARES
+
+// Serving static files
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Helmet helps you secure your Express apps by setting various HTTP headers
 app.use(helmet());
@@ -48,8 +54,6 @@ app.use(
     ],
   })
 );
-// Serving static files
-app.use(express.static('public'));
 
 // rate limit implementation
 const limiter = rateLimit({
@@ -63,6 +67,10 @@ app.use('/api', limiter);
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   next();
+});
+
+app.get('/', (req, res) => {
+  res.status(200).render('base', { tour: 'Killhouse Camper', user: 'Bolaji' });
 });
 
 app.use(`${API_BASE_URL}/tours`, tourRouter);
