@@ -6,7 +6,7 @@ const handleDBCastError = (err) => {
 };
 
 const handleDBDuplicateError = (err) => {
-  const message = `Duplicate value, '${err.keyValue.name}' for the '${
+  const message = `Duplicate value, '${Object.values(err.keyValue)[0]}' for the '${
     Object.keys(err.keyPattern)[0]
   }' field.`;
   return new AppError(message, 400);
