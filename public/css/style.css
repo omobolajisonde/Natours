@@ -666,6 +666,7 @@ body {
   height: 2rem;
   width: 2rem;
   margin-right: 1px;
+  fill: #bbb;
 }
 .reviews__star--active {
   fill: #55c57a;
